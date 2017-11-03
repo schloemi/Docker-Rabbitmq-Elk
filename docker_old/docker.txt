@@ -1,0 +1,27 @@
+########################################
+# Dockerfile
+
+FROM logstash
+
+RUN logstash-plugin install logstash-input-rabbitmq
+
+COPY logstash.conf /config-dir/
+
+CMD ["-f", "/config-dir/logstash.conf"]
+
+########################################
+
+
+
+
+
+docker build -t my-logstash .
+
+
+docker run -d --name elasticsearch -h elasticsearch -p 9200:9200 -p 9300:9300 -it elasticsearch
+docker run -d --name kibana -h kibana -p 5601:5601 --link elasticsearch kibana
+docker run -d --name rabbitmq -h rabbitmq  -p 8081:15672 -p 5672:5672 rabbitmq:3-management
+
+
+
+docker run -d --name logstash -h logstash --link rabbitmq --link elasticsearch my-logstash
